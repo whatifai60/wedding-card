@@ -6,7 +6,7 @@ from streamlit_folium import st_folium
 # 1. 페이지 설정
 st.set_page_config(page_title="김준태 · 김경미 결혼식", page_icon="💍", layout="centered")
 
-# 2. 강제 레이아웃 고정 CSS (노트북처럼 옆으로 보이게)
+# 2. 디자인 CSS (모바일 레이아웃 고정 및 회색 클릭 효과 제거)
 st.markdown("""
     <style>
     .stApp { background-color: #F9F8F6; }
@@ -23,22 +23,28 @@ st.markdown("""
     hr { margin: 50px 0; border: 0; border-top: 1px solid #eee; }
     .leaflet-marker-icon, .leaflet-marker-shadow { display: none !important; }
 
-    /* [중요] 모바일에서도 컬럼을 옆으로 나란히 배치하는 마법의 코드 */
+    /* [해결] 클릭 시 회색 잔상 제거 및 모바일 3열 고정 */
+    * {
+        -webkit-tap-highlight-color: transparent !important;
+        outline: none !important;
+    }
+    
     [data-testid="column"] {
         min-width: 30% !important;
         flex: 1 1 30% !important;
     }
     
-    /* 복사 버튼 스타일 */
+    /* 복사 버튼 디자인 */
     .copy-btn {
         background-color: #333333;
         color: white;
         border: none;
-        padding: 8px 15px;
+        padding: 8px 16px;
         border-radius: 20px;
         font-size: 13px;
         cursor: pointer;
         font-weight: bold;
+        -webkit-appearance: none;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -64,7 +70,7 @@ st.markdown('<div style="font-size: 16px; line-height: 2.2; color: #444;">오랜
 
 st.divider()
 
-# 4. 연락처 (옆으로 나란히 고정)
+# 4. 연락처 (나란히 배치)
 c1, c2 = st.columns(2)
 with c1:
     st.markdown('<div style="text-align: center;"><p style="font-weight: bold; font-size: 18px;">신랑</p><p style="font-size: 16px;">김준태</p><p style="font-size: 14px; color: #777;">부 김종우<br>모 김미나</p></div>', unsafe_allow_html=True)
@@ -73,7 +79,7 @@ with c2:
 
 st.divider()
 
-# 5. 갤러리 (3열 고정)
+# 5. 갤러리 (3열 배치)
 st.markdown('<p class="eng-title">Gallery</p>', unsafe_allow_html=True)
 existing_photos = [f"photo ({i}).jpg" for i in range(1, 31) if os.path.exists(f"photo ({i}).jpg")]
 if existing_photos:
@@ -84,7 +90,7 @@ if existing_photos:
 
 st.divider()
 
-# 6. 장소 및 지도
+# 6. 장소
 st.markdown('<p class="eng-title">Location</p>', unsafe_allow_html=True)
 st.markdown('<p style="font-size: 18px; font-weight: bold; color: #333333;">웨딩시티 4층</p><p style="color: #666;">서울 구로구 구로동 3-25 (신도림 테크노마트)</p>', unsafe_allow_html=True)
 
@@ -96,29 +102,34 @@ st.markdown('<div style="text-align: center; margin-top: 15px;"><a href="https:/
 
 st.divider()
 
-# 7. 축의금 및 복사 (절대 실패 없는 복사 코드)
+# 7. 계좌번호 복사 (최종 호환성 버전)
 st.markdown('<p style="font-size: 20px; text-align: center;">마음 전하실 곳</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
-    # HTML 내부에 직접 자바스크립트를 포함시켜 보안 차단을 피함
+    # 가장 원초적인 텍스트 복사 방식 적용
+    unique_id = account_number.replace('-', '')
     html_code = f"""
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; border-radius: 12px; margin-bottom: 12px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; border-radius: 12px; margin-bottom: 12px; -webkit-tap-highlight-color: transparent;">
         <div style="text-align: left;">
             <span style="font-size: 13px; color: #888;">{title}</span><br>
-            <span id="acc_{account_number.replace('-', '')}" style="font-size: 16px; font-weight: bold; color: #333;">{account_number}</span>
+            <span style="font-size: 16px; font-weight: bold; color: #333;">{account_number}</span>
         </div>
-        <button class="copy-btn" onclick="copyFunc('{account_number}')">복사</button>
+        <button class="copy-btn" id="btn_{unique_id}">복사</button>
     </div>
     <script>
-    function copyFunc(text) {{
-        const el = document.createElement('textarea');
-        el.value = text;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-        alert('복사되었습니다: ' + text);
-    }}
+    document.getElementById('btn_{unique_id}').addEventListener('click', function() {{
+        const input = document.createElement('input');
+        input.setAttribute('value', '{account_number}');
+        document.body.appendChild(input);
+        input.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(input);
+        if (success) {{
+            alert('계좌번호가 복사되었습니다.');
+        }} else {{
+            confirm('복사에 실패했습니다. 번호를 직접 복사해주세요: {account_number}');
+        }}
+    }});
     </script>
     """
     st.markdown(html_code, unsafe_allow_html=True)
