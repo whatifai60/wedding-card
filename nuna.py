@@ -18,7 +18,13 @@ st.markdown("""
     .stApp { background-color: #F9F8F6; }
     div.stMarkdown { text-align: center; color: #333333; }
     
-    /* [수정] 지도 태그 너비 및 한 줄 고정 */
+    /* 터치 시 회색 잔상 제거 */
+    * {
+        -webkit-tap-highlight-color: transparent !important;
+        outline: none !important;
+    }
+
+    /* 지도 태그 가로 한 줄 고정 */
     .map-tag {
         background-color: #333333 !important;
         color: white !important;
@@ -64,7 +70,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 2. 메인 이미지
+# 2. 메인 이미지 (Base64)
 if os.path.exists("main.jpg"):
     main_b64 = get_image_base64("main.jpg")
     st.markdown(f'<img src="data:image/jpeg;base64,{main_b64}" style="width:100%; height:auto;">', unsafe_allow_html=True)
@@ -104,7 +110,7 @@ st.markdown("""
 
 st.divider()
 
-# 5. 갤러리
+# 5. 갤러리 (Base64)
 st.markdown('<p class="eng-title">Gallery</p>', unsafe_allow_html=True)
 existing_photos = [f"photo ({i}).jpg" for i in range(1, 31) if os.path.exists(f"photo ({i}).jpg")]
 
@@ -136,11 +142,10 @@ st.markdown('<div style="text-align: center; margin-top: 15px;"><a href="https:/
 
 st.divider()
 
-# 7. 축의금 복사 (보안 강화 및 클릭 임팩트 추가 버전)
+# 7. 축의금 복사 (알림창 제거 버전)
 st.markdown('<p style="font-size: 20px; text-align: center;">마음 전하실 곳</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
-    # HTML 컴포넌트를 사용하여 독립적인 자바스크립트 실행 보장
     html_content = f"""
     <style>
         .row {{ display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: white; border-radius: 10px; font-family: sans-serif; }}
@@ -150,26 +155,31 @@ def account_row(title, account_number):
         .btn {{ 
             background-color: #333; color: white; border: none; padding: 8px 14px; 
             border-radius: 18px; font-size: 12px; font-weight: bold; cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s; -webkit-tap-highlight-color: transparent;
         }}
-        .btn:active {{ background-color: #888; transform: scale(0.95); }}
+        /* 클릭 시 색상 변화로 피드백 전달 */
+        .btn:active {{ background-color: #03C75A; transform: scale(0.9); }}
     </style>
     <div class="row">
         <div class="info">
             <div class="title">{title}</div>
             <div class="acc">{account_number}</div>
         </div>
-        <button class="btn" onclick="copyText('{account_number}')">복사</button>
+        <button class="btn" onclick="copyText(this, '{account_number}')">복사</button>
     </div>
     <script>
-        function copyText(val) {{
+        function copyText(btn, val) {{
             const t = document.createElement('textarea');
             t.value = val;
             document.body.appendChild(t);
             t.select();
             document.execCommand('copy');
             document.body.removeChild(t);
-            alert('복사되었습니다!');
+            
+            // 알림창 대신 버튼 텍스트를 잠시 바꿈
+            const originalText = btn.innerText;
+            btn.innerText = '완료';
+            setTimeout(() => {{ btn.innerText = originalText; }}, 1000);
         }}
     </script>
     """
