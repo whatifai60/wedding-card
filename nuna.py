@@ -12,31 +12,24 @@ def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# 3. CSS 설정 (회색 잔상 제거 및 지도 태그 수정)
+# 3. CSS 설정
 st.markdown("""
     <style>
     .stApp { background-color: #F9F8F6; }
     div.stMarkdown { text-align: center; color: #333333; }
     
-    /* [핵심] 클릭 시 회색 하이라이트 완전히 제거 */
-    * {
-        -webkit-tap-highlight-color: transparent !important;
-        outline: none !important;
-    }
-
-    /* 지도 태그 가로 유지 및 한 줄 출력 */
+    /* [수정] 지도 태그 너비 및 한 줄 고정 */
     .map-tag {
-        background-color: #333333;
-        color: white;
-        text-align: center;
-        line-height: 34px;
-        font-size: 14px;
-        font-weight: bold;
-        border-radius: 18px;
-        border: 2px solid white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        width: 130px !important;  /* 충분한 너비 부여 */
-        white-space: nowrap !important; /* 줄바꿈 절대 방지 */
+        background-color: #333333 !important;
+        color: white !important;
+        text-align: center !important;
+        line-height: 34px !important;
+        font-size: 14px !important;
+        font-weight: bold !important;
+        border-radius: 18px !important;
+        border: 2px solid white !important;
+        width: 120px !important;
+        white-space: nowrap !important;
         display: block !important;
     }
 
@@ -65,12 +58,6 @@ st.markdown("""
         font-family: 'Times New Roman', serif;
         font-style: italic; font-size: 26px;
         color: #B2A59B; margin-top: 30px; margin-bottom: 10px;
-    }
-
-    .copy-btn {
-        background-color: #333333; color: white; border: none;
-        padding: 8px 15px; border-radius: 20px; font-size: 13px;
-        font-weight: bold; cursor: pointer;
     }
     
     .leaflet-marker-icon, .leaflet-marker-shadow { display: none !important; }
@@ -135,12 +122,11 @@ st.markdown('<p class="eng-title">Location</p>', unsafe_allow_html=True)
 st.markdown('<p style="font-size: 18px; font-weight: bold; color: #333333;">웨딩시티 4층</p><p style="color: #666;">서울 구로구 구로동 3-25 (신도림 테크노마트)</p>', unsafe_allow_html=True)
 
 m = folium.Map(location=[37.5070431, 126.8902185], zoom_start=17)
-# 지도 태그 텍스트 짤림 방지를 위해 전용 CSS 클래스 적용
 folium.Marker(
     [37.5070431, 126.8902185], 
     icon=folium.DivIcon(
-        icon_size=(130,36), 
-        icon_anchor=(65,18), 
+        icon_size=(120,36), 
+        icon_anchor=(60,18), 
         html='<div class="map-tag">웨딩시티 4층</div>'
     )
 ).add_to(m)
@@ -150,32 +136,44 @@ st.markdown('<div style="text-align: center; margin-top: 15px;"><a href="https:/
 
 st.divider()
 
-# 7. 축의금 복사
+# 7. 축의금 복사 (보안 강화 및 클릭 임팩트 추가 버전)
 st.markdown('<p style="font-size: 20px; text-align: center;">마음 전하실 곳</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
-    # 가장 확실한 구형+신형 브라우저 공용 복사 스크립트
-    st.write(f"""
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; border-radius: 12px; margin-bottom: 12px;">
-            <div style="text-align: left;">
-                <span style="font-size: 13px; color: #888;">{title}</span><br>
-                <span style="font-size: 16px; font-weight: bold; color: #333;">{account_number}</span>
-            </div>
-            <button class="copy-btn" onclick="
-                const el = document.createElement('textarea');
-                el.value = '{account_number}';
-                document.body.appendChild(el);
-                el.select();
-                try {{
-                    document.execCommand('copy');
-                    alert('복사되었습니다: {account_number}');
-                }} catch (e) {{
-                    alert('복사에 실패했습니다. 번호를 직접 복사해주세요.');
-                }}
-                document.body.removeChild(el);
-            ">복사</button>
+    # HTML 컴포넌트를 사용하여 독립적인 자바스크립트 실행 보장
+    html_content = f"""
+    <style>
+        .row {{ display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: white; border-radius: 10px; font-family: sans-serif; }}
+        .info {{ text-align: left; }}
+        .title {{ font-size: 12px; color: #888; }}
+        .acc {{ font-size: 15px; font-weight: bold; color: #333; }}
+        .btn {{ 
+            background-color: #333; color: white; border: none; padding: 8px 14px; 
+            border-radius: 18px; font-size: 12px; font-weight: bold; cursor: pointer;
+            transition: background 0.2s;
+        }}
+        .btn:active {{ background-color: #888; transform: scale(0.95); }}
+    </style>
+    <div class="row">
+        <div class="info">
+            <div class="title">{title}</div>
+            <div class="acc">{account_number}</div>
         </div>
-    """, unsafe_allow_html=True)
+        <button class="btn" onclick="copyText('{account_number}')">복사</button>
+    </div>
+    <script>
+        function copyText(val) {{
+            const t = document.createElement('textarea');
+            t.value = val;
+            document.body.appendChild(t);
+            t.select();
+            document.execCommand('copy');
+            document.body.removeChild(t);
+            alert('복사되었습니다!');
+        }}
+    </script>
+    """
+    st.components.v1.html(html_content, height=75)
 
 with st.expander("신랑 측 계좌번호"):
     account_row("국민은행 (신랑 김준태)", "123-45678-90")
