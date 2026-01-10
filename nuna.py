@@ -1,30 +1,44 @@
 import streamlit as st
 import os
 import folium
+import base64
 from streamlit_folium import st_folium
 
 # 1. 페이지 설정
 st.set_page_config(page_title="김준태 · 김경미 결혼식", page_icon="💍", layout="centered")
 
-# 2. 강력한 CSS (회색 잔상 제거 및 3열 강제 고정)
+# 2. 이미지 Base64 변환 함수 (사용자님이 성공하셨던 방식 유지)
+def get_image_base64(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+# 3. 디자인 CSS (클릭 시 회색 하이라이트 제거 및 레이아웃 고정)
 st.markdown("""
     <style>
+    /* 전체 배경 및 텍스트 설정 */
     .stApp { background-color: #F9F8F6; }
     div.stMarkdown { text-align: center; color: #333333; }
     
-    /* [해결] 클릭 시 회색 하이라이트 완전히 제거 */
+    /* [핵심] 모든 클릭/터치 시 발생하는 회색 하이라이트 제거 */
     * {
         -webkit-tap-highlight-color: transparent !important;
         -webkit-touch-callout: none !important;
         outline: none !important;
     }
-    
-    /* [해결] 모바일 세로 쌓임 방지: 갤러리 3열 고정 */
+
+    .eng-title {
+        font-family: 'Times New Roman', serif;
+        font-style: italic; font-size: 26px;
+        color: #B2A59B; margin-top: 30px; margin-bottom: 10px;
+    }
+
+    /* 갤러리 3열 고정 (HTML Grid용) */
     .gallery-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 8px;
-        margin: 20px 0;
+        width: 100%;
+        margin-top: 20px;
     }
     .gallery-grid img {
         width: 100%;
@@ -42,12 +56,7 @@ st.markdown("""
         margin: 20px 0;
     }
 
-    .eng-title {
-        font-family: 'Times New Roman', serif;
-        font-style: italic; font-size: 26px;
-        color: #B2A59B; margin-top: 30px; margin-bottom: 10px;
-    }
-
+    /* 복사 버튼 스타일 */
     .copy-btn {
         background-color: #333333; color: white; border: none;
         padding: 8px 15px; border-radius: 20px; font-size: 13px;
@@ -59,9 +68,10 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 2. 메인 이미지 (용량 문제 방지를 위해 st.image 사용)
+# 2. 메인 이미지 (Base64 방식)
 if os.path.exists("main.jpg"):
-    st.image("main.jpg", use_container_width=True)
+    main_b64 = get_image_base64("main.jpg")
+    st.markdown(f'<img src="data:image/jpeg;base64,{main_b64}" style="width:100%; height:auto;">', unsafe_allow_html=True)
 
 st.markdown("""
     <div style="text-align: center;">
@@ -80,7 +90,7 @@ st.markdown('<div style="font-size: 16px; line-height: 2.2; color: #444;">오랜
 
 st.divider()
 
-# 4. 연락처 (나란히 배치 고정)
+# 4. 연락처 (나란히 배치)
 st.markdown("""
     <div class="contact-row">
         <div style="text-align: center;">
@@ -98,25 +108,16 @@ st.markdown("""
 
 st.divider()
 
-# 5. 갤러리 (3열 고정 및 로딩 최적화)
+# 5. 갤러리 (Base64 방식 + HTML Grid 3열 고정)
 st.markdown('<p class="eng-title">Gallery</p>', unsafe_allow_html=True)
 existing_photos = [f"photo ({i}).jpg" for i in range(1, 31) if os.path.exists(f"photo ({i}).jpg")]
 
 if existing_photos:
-    # 컬럼 방식은 모바일에서 깨지므로 HTML Grid 사용
-    # 단, base64 대신 st.image의 내부 캐시 시스템을 활용하기 위해 아래 구조 사용
-    cols = st.columns(3)
-    for idx, photo_path in enumerate(existing_photos):
-        with cols[idx % 3]:
-            # CSS에서 컬럼의 너비를 강제 조정하여 3열 유지
-            st.image(photo_path, use_container_width=True)
-    
-    # 모바일에서도 3열 유지를 위한 보조 CSS 추가
-    st.markdown("""
-        <style>
-        [data-testid="column"] { flex: 1 1 30% !important; min-width: 30% !important; }
-        </style>
-        """, unsafe_allow_html=True)
+    gallery_items = ""
+    for photo in existing_photos:
+        b64 = get_image_base64(photo)
+        gallery_items += f'<img src="data:image/jpeg;base64,{b64}">'
+    st.markdown(f'<div class="gallery-grid">{gallery_items}</div>', unsafe_allow_html=True)
 
 st.divider()
 
@@ -132,7 +133,7 @@ st.markdown('<div style="text-align: center; margin-top: 15px;"><a href="https:/
 
 st.divider()
 
-# 7. 축의금 복사 (회색 효과 없는 최종 버전)
+# 7. 축의금 복사 (회색 효과 제거 및 인라인 스크립트)
 st.markdown('<p style="font-size: 20px; text-align: center;">마음 전하실 곳</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
