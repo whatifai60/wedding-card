@@ -7,38 +7,19 @@ from streamlit_folium import st_folium
 # 1. 페이지 설정
 st.set_page_config(page_title="김준태 · 김경미 결혼식", page_icon="💍", layout="centered")
 
-# 2. 강력한 CSS (가로 슬라이더 및 회색 잔상 제거)
+# 2. 이미지 Base64 변환 함수
+def get_image_base64(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+# 3. CSS 설정
 st.markdown("""
     <style>
     .stApp { background-color: #F9F8F6; }
     div.stMarkdown { text-align: center; color: #333333; }
     
-    /* 클릭 시 회색 잔상 제거 */
+    /* 터치 회색 잔상 제거 */
     * { -webkit-tap-highlight-color: transparent !important; outline: none !important; }
-
-    /* [핵심] 가로 슬라이더 레이아웃 */
-    .gallery-slider {
-        display: flex;
-        overflow-x: auto; /* 가로 스크롤 활성화 */
-        scroll-snap-type: x mandatory; /* 한 장씩 걸리는 느낌 */
-        gap: 15px;
-        padding-bottom: 20px;
-        -webkit-overflow-scrolling: touch; /* 모바일 부드러운 스크롤 */
-    }
-    
-    .gallery-slider::-webkit-scrollbar { display: none; } /* 스크롤바 숨기기 */
-
-    .slider-item {
-        flex: 0 0 85%; /* 화면의 85% 너비 차지 (다음 사진 살짝 보임) */
-        scroll-snap-align: center;
-        border-radius: 12px;
-    }
-    
-    .slider-item img {
-        width: 100%;
-        border-radius: 12px;
-        object-fit: contain;
-    }
 
     .eng-title {
         font-family: 'Times New Roman', serif;
@@ -46,14 +27,7 @@ st.markdown("""
         color: #B2A59B; margin-top: 30px; margin-bottom: 10px;
     }
 
-    .contact-row {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        width: 100%;
-        margin: 20px 0;
-    }
-
+    /* 지도 태그 스타일 */
     .map-tag {
         background-color: #333333 !important; color: white !important;
         text-align: center !important; line-height: 34px !important;
@@ -66,11 +40,6 @@ st.markdown("""
     .leaflet-marker-icon, .leaflet-marker-shadow { display: none !important; }
     </style>
     """, unsafe_allow_html=True)
-
-# 이미지 Base64 변환 함수
-def get_image_base64(path):
-    with open(path, "rb") as f:
-        return base64.b64encode(f.read()).decode()
 
 # 2. 메인 이미지
 if os.path.exists("main.jpg"):
@@ -96,7 +65,7 @@ st.divider()
 
 # 4. 연락처
 st.markdown("""
-    <div class="contact-row">
+    <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; margin: 20px 0;">
         <div style="text-align: center;">
             <p style="font-weight: bold; font-size: 18px;">신랑</p>
             <p style="font-size: 16px;">김준태</p>
@@ -112,18 +81,50 @@ st.markdown("""
 
 st.divider()
 
-# 5. 갤러리 (로딩 문제 없는 가로 스크롤 방식)
+# 5. 갤러리 (자동 무한 루프 슬라이더)
 st.markdown('<p class="eng-title">Gallery</p>', unsafe_allow_html=True)
 existing_photos = [f"photo ({i}).jpg" for i in range(1, 31) if os.path.exists(f"photo ({i}).jpg")]
 
 if existing_photos:
-    gallery_items = ""
+    slides_html = ""
     for photo in existing_photos:
         b64 = get_image_base64(photo)
-        gallery_items += f'<div class="slider-item"><img src="data:image/jpeg;base64,{b64}"></div>'
+        slides_html += f'<div class="swiper-slide"><img src="data:image/jpeg;base64,{b64}" style="width:100%; border-radius:10px;"></div>'
     
-    # HTML 방식으로 슬라이더 구현 (보안 이슈 없음)
-    st.markdown(f'<div class="gallery-slider">{gallery_items}</div>', unsafe_allow_html=True)
+    # Swiper를 이용한 무한 자동 재생 스크립트
+    slider_content = f"""
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <style>
+        .swiper {{ width: 100%; height: 100%; padding-bottom: 30px; }}
+        .swiper-slide {{ display: flex; justify-content: center; align-items: center; width: 85%; }}
+        .swiper-pagination-bullet-active {{ background: #B2A59B !important; }}
+    </style>
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+            {slides_html}
+        </div>
+        <div class="swiper-pagination"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        var swiper = new Swiper(".mySwiper", {{
+            loop: true,
+            centeredSlides: true,
+            slidesPerView: "auto",
+            spaceBetween: 20,
+            autoplay: {{
+                delay: 2500,
+                disableOnInteraction: false,
+            }},
+            pagination: {{
+                el: ".swiper-pagination",
+                clickable: true,
+            }},
+        }});
+    </script>
+    """
+    # height를 사진 비율에 맞춰 넉넉히 주어야 잘리지 않습니다.
+    st.components.v1.html(slider_content, height=500)
 
 st.divider()
 
@@ -146,17 +147,30 @@ st.divider()
 st.markdown('<p style="font-size: 20px; text-align: center;">마음 전하실 곳</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
-    # iframe 없이 직접 출력하여 복사 성공률 높임
-    st.markdown(f"""
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; border-radius: 12px; margin-bottom: 12px;">
-            <div style="text-align: left;">
-                <span style="font-size: 13px; color: #888;">{title}</span><br>
-                <span style="font-size: 16px; font-weight: bold; color: #333;">{account_number}</span>
-            </div>
-            <button onclick="const t = document.createElement('textarea'); t.value = '{account_number}'; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); this.innerText='완료'; setTimeout(()=>this.innerText='복사', 1000);" 
-                style="background-color: #333; color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer;">복사</button>
+    acc_html = f"""
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; border-radius: 12px; margin-bottom: 12px; font-family: sans-serif;">
+        <div style="text-align: left;">
+            <div style="font-size: 13px; color: #888;">{title}</div>
+            <div style="font-size: 16px; font-weight: bold; color: #333;">{account_number}</div>
         </div>
-    """, unsafe_allow_html=True)
+        <button onclick="copyAcc('{account_number}', this)" style="background-color: #333; color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s;">복사</button>
+    </div>
+    <script>
+        function copyAcc(val, btn) {{
+            const t = document.createElement('textarea');
+            t.value = val;
+            document.body.appendChild(t);
+            t.select();
+            document.execCommand('copy');
+            document.body.removeChild(t);
+            const ori = btn.innerText;
+            btn.innerText = '완료';
+            btn.style.backgroundColor = '#03C75A';
+            setTimeout(() => {{ btn.innerText = ori; btn.style.backgroundColor = '#333'; }}, 1000);
+        }}
+    </script>
+    """
+    st.components.v1.html(acc_html, height=80)
 
 with st.expander("신랑 측 계좌번호"):
     account_row("국민은행 (신랑 김준태)", "123-45678-90")
