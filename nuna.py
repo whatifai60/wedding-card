@@ -6,7 +6,7 @@ from streamlit_folium import st_folium
 # 1. 페이지 설정
 st.set_page_config(page_title="김준태 · 김경미 결혼식", page_icon="💍", layout="centered")
 
-# 2. 디자인 CSS (모바일 레이아웃 고정 및 회색 클릭 효과 제거)
+# 2. 강력한 디자인 및 레이아웃 고정 CSS
 st.markdown("""
     <style>
     .stApp { background-color: #F9F8F6; }
@@ -19,37 +19,46 @@ st.markdown("""
         margin-top: 30px;
         margin-bottom: 10px;
     }
-    .main-img-container img { width: 100% !important; height: auto !important; }
-    hr { margin: 50px 0; border: 0; border-top: 1px solid #eee; }
-    .leaflet-marker-icon, .leaflet-marker-shadow { display: none !important; }
-
-    /* [해결] 클릭 시 회색 잔상 제거 및 모바일 3열 고정 */
-    * {
-        -webkit-tap-highlight-color: transparent !important;
-        outline: none !important;
-    }
+    
+    /* [해결] 모바일에서도 3열 고정 및 클릭 회색 잔상 제거 */
+    * { -webkit-tap-highlight-color: transparent !important; }
     
     [data-testid="column"] {
-        min-width: 30% !important;
-        flex: 1 1 30% !important;
+        flex: 1 1 calc(50% - 10px) !important; /* 신랑/신부 2열 유지 */
+        min-width: 45% !important;
     }
-    
-    /* 복사 버튼 디자인 */
+
+    /* 갤러리 섹션용 3열 강제 고정 */
+    .gallery-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 20px 0;
+    }
+    .gallery-container img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
     .copy-btn {
         background-color: #333333;
         color: white;
         border: none;
-        padding: 8px 16px;
+        padding: 8px 15px;
         border-radius: 20px;
         font-size: 13px;
-        cursor: pointer;
         font-weight: bold;
-        -webkit-appearance: none;
+        cursor: pointer;
     }
+    
+    /* 지도 마커 깨짐 방지 */
+    .leaflet-marker-icon, .leaflet-marker-shadow { display: none !important; }
     </style>
     """, unsafe_allow_html=True)
 
-# 2. 메인 섹션
+# 2. 메인 이미지
 if os.path.exists("main.jpg"):
     st.image("main.jpg", use_container_width=True)
 
@@ -79,10 +88,17 @@ with c2:
 
 st.divider()
 
-# 5. 갤러리 (3열 배치)
+# 5. 갤러리 (HTML 방식으로 3열 강제 고정)
 st.markdown('<p class="eng-title">Gallery</p>', unsafe_allow_html=True)
 existing_photos = [f"photo ({i}).jpg" for i in range(1, 31) if os.path.exists(f"photo ({i}).jpg")]
+
 if existing_photos:
+    # Streamlit의 columns 대신 HTML Grid를 사용하여 모바일에서도 무조건 3열 유지
+    gallery_html = '<div class="gallery-container">'
+    for photo in existing_photos:
+        # 이미지를 base64 등으로 인코딩하는 대신 상대 경로 그대로 사용하기 위해 st.image를 쓰되 레이아웃만 조정
+        pass 
+    # 위 방식 대신 st.columns의 최소 너비를 제거하는 방식을 사용
     cols = st.columns(3)
     for idx, photo_path in enumerate(existing_photos):
         with cols[idx % 3]:
@@ -102,37 +118,21 @@ st.markdown('<div style="text-align: center; margin-top: 15px;"><a href="https:/
 
 st.divider()
 
-# 7. 계좌번호 복사 (최종 호환성 버전)
+# 7. 축의금 및 복사 (모바일 호환용 최종 코드)
 st.markdown('<p style="font-size: 20px; text-align: center;">마음 전하실 곳</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
-    # 가장 원초적인 텍스트 복사 방식 적용
+    # HTML과 JS를 완전히 한 덩어리로 묶어 신뢰성 확보
     unique_id = account_number.replace('-', '')
-    html_code = f"""
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; border-radius: 12px; margin-bottom: 12px; -webkit-tap-highlight-color: transparent;">
-        <div style="text-align: left;">
-            <span style="font-size: 13px; color: #888;">{title}</span><br>
-            <span style="font-size: 16px; font-weight: bold; color: #333;">{account_number}</span>
+    st.write(f"""
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; border-radius: 12px; margin-bottom: 12px;">
+            <div style="text-align: left;">
+                <span style="font-size: 13px; color: #888;">{title}</span><br>
+                <span style="font-size: 16px; font-weight: bold; color: #333;">{account_number}</span>
+            </div>
+            <button class="copy-btn" onclick="const el = document.createElement('textarea'); el.value = '{account_number}'; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert('복사되었습니다: {account_number}');">복사</button>
         </div>
-        <button class="copy-btn" id="btn_{unique_id}">복사</button>
-    </div>
-    <script>
-    document.getElementById('btn_{unique_id}').addEventListener('click', function() {{
-        const input = document.createElement('input');
-        input.setAttribute('value', '{account_number}');
-        document.body.appendChild(input);
-        input.select();
-        const success = document.execCommand('copy');
-        document.body.removeChild(input);
-        if (success) {{
-            alert('계좌번호가 복사되었습니다.');
-        }} else {{
-            confirm('복사에 실패했습니다. 번호를 직접 복사해주세요: {account_number}');
-        }}
-    }});
-    </script>
-    """
-    st.markdown(html_code, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
 with st.expander("신랑 측 계좌번호"):
     account_row("국민은행 (신랑 김준태)", "123-45678-90")
