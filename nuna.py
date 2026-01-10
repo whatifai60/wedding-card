@@ -12,10 +12,32 @@ def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# 3. CSS 설정
+# 3. CSS 설정 (폰트 추가 및 중앙 정렬 강화)
 st.markdown("""
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
+    /* 전체 폰트를 나눔명조로 설정 */
+    html, body, [class*="css"] {
+        font-family: 'Nanum Myeongjo', serif !important;
+    }
+    
     .stApp { background-color: #F9F8F6; }
+    
+    /* [수정] 메인 이름 중앙 정렬 및 디자인 */
+    .main-names {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+        margin-top: -10px;
+        margin-bottom: 20px;
+        font-weight: 700;
+        color: #333333;
+        font-size: 32px; /* 이름 크기 살짝 키움 */
+        letter-spacing: 2px;
+    }
+
     div.stMarkdown { text-align: center; color: #333333; }
     
     /* 터치 회색 잔상 제거 */
@@ -46,10 +68,11 @@ if os.path.exists("main.jpg"):
     main_b64 = get_image_base64("main.jpg")
     st.markdown(f'<img src="data:image/jpeg;base64,{main_b64}" style="width:100%; height:auto;">', unsafe_allow_html=True)
 
-st.markdown("""
+# [수정] 중앙 정렬을 위한 전용 컨테이너 사용
+st.markdown(f"""
     <div style="text-align: center;">
         <p class="eng-title">THE WEDDING OF</p>
-        <h1 style="color: #333333; margin-top: -10px; font-weight: 400;">김준태 &nbsp; · &nbsp; 김경미</h1>
+        <div class="main-names">김준태 &nbsp; · &nbsp; 김경미</div>
         <p style="color: #333333; font-size: 17px; margin-bottom: 5px; font-weight: 500;">2026.05.10 SUN PM 1:20</p>
         <p style="color: #333333; font-size: 17px; font-weight: 500;">웨딩시티 4층</p>
     </div>
@@ -91,11 +114,10 @@ if existing_photos:
         b64 = get_image_base64(photo)
         slides_html += f'<div class="swiper-slide"><img src="data:image/jpeg;base64,{b64}" style="width:100%; border-radius:10px;"></div>'
     
-    # Swiper를 이용한 무한 자동 재생 스크립트
     slider_content = f"""
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
-        .swiper {{ width: 100%; height: 100%; padding-bottom: 30px; }}
+        .swiper {{ width: 100%; padding-bottom: 30px; }}
         .swiper-slide {{ display: flex; justify-content: center; align-items: center; width: 85%; }}
         .swiper-pagination-bullet-active {{ background: #B2A59B !important; }}
     </style>
@@ -113,9 +135,10 @@ if existing_photos:
             slidesPerView: "auto",
             spaceBetween: 20,
             autoplay: {{
-                delay: 1500,
+                delay: 1500,  /* 요청하신 대로 1500으로 설정 */
                 disableOnInteraction: false,
             }},
+            speed: 1000,
             pagination: {{
                 el: ".swiper-pagination",
                 clickable: true,
@@ -123,7 +146,6 @@ if existing_photos:
         }});
     </script>
     """
-    # height를 사진 비율에 맞춰 넉넉히 주어야 잘리지 않습니다.
     st.components.v1.html(slider_content, height=500)
 
 st.divider()
@@ -148,7 +170,7 @@ st.markdown('<p style="font-size: 20px; text-align: center;">마음 전하실 �
 
 def account_row(title, account_number):
     acc_html = f"""
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; border-radius: 12px; margin-bottom: 12px; font-family: sans-serif;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; border-radius: 12px; margin-bottom: 12px;">
         <div style="text-align: left;">
             <div style="font-size: 13px; color: #888;">{title}</div>
             <div style="font-size: 16px; font-weight: bold; color: #333;">{account_number}</div>
