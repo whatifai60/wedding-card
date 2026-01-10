@@ -12,50 +12,54 @@ def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# 3. CSS 설정 (상단 노출되던 코드들을 style 태그 안으로 정리)
+# 3. CSS 설정 (폰트 분리 및 강제 중앙 정렬)
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-    /* 전체 폰트 및 중앙 정렬 */
-    html, body, [data-testid="stAppViewContainer"] {
-        font-family: 'Nanum Myeongjo', serif !important;
+    /* 전체 배경 및 기본 중앙 정렬 */
+    .stApp { 
+        background-color: #F9F8F6; 
         text-align: center !important;
     }
     
-    .stApp { background-color: #F9F8F6; }
-
-    /* 모든 마크다운 요소 강제 중앙 정렬 */
-    div.stMarkdown, div.stMarkdown p, div.stText {
-        text-align: center !important;
+    /* 모든 요소 강제 중앙 정렬 */
+    [data-testid="stVerticalBlock"], .stMarkdown, p, div {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
+        text-align: center !important;
         width: 100% !important;
     }
+
+    /* 한글 기본 폰트: 나눔명조 */
+    html, body, [data-testid="stAppViewContainer"] {
+        font-family: 'Nanum Myeongjo', serif !important;
+    }
     
-    /* 메인 이름 크기 조절 */
+    /* 영문 주요 제목 폰트: Times New Roman (이전 스타일 복구) */
+    .eng-title {
+        font-family: 'Times New Roman', serif !important;
+        font-style: italic !important; 
+        font-size: 24px !important;
+        color: #B2A59B !important; 
+        margin-top: 30px !important; 
+        margin-bottom: 10px !important;
+        display: block !important;
+    }
+
+    /* 메인 이름 크기 (중간 사이즈 26px) */
     .main-names {
-        display: block;
-        text-align: center;
-        width: 100%;
-        margin: 10px 0 25px 0;
-        font-weight: 700;
-        color: #333333;
-        font-size: 26px; 
-        letter-spacing: 1px;
+        font-family: 'Nanum Myeongjo', serif !important;
+        font-weight: 700 !important;
+        color: #333333 !important;
+        font-size: 26px !important; 
+        letter-spacing: 1px !important;
+        margin: 10px 0 25px 0 !important;
     }
 
     /* 터치 회색 잔상 제거 */
     * { -webkit-tap-highlight-color: transparent !important; outline: none !important; }
-
-    .eng-title {
-        font-family: 'Times New Roman', serif;
-        font-style: italic; font-size: 24px;
-        color: #B2A59B; margin-top: 30px; margin-bottom: 5px;
-        text-align: center;
-        width: 100%;
-    }
 
     /* 지도 태그 스타일 */
     .map-tag {
@@ -65,19 +69,27 @@ st.markdown("""
         border-radius: 18px !important; border: 2px solid white !important;
         width: 120px !important; white-space: nowrap !important;
         display: block !important;
+        font-family: 'Nanum Myeongjo', serif !important;
     }
     
     .leaflet-marker-icon, .leaflet-marker-shadow { display: none !important; }
     
-    /* 구분선 중앙 정렬 */
-    hr { margin-left: auto !important; margin-right: auto !important; }
+    /* 구분선 */
+    hr { width: 100% !important; margin: 40px 0 !important; }
+
+    /* 연락처 섹션 가로 정렬 유지 */
+    .contact-row {
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
 # 2. 메인 이미지
 if os.path.exists("main.jpg"):
     main_b64 = get_image_base64("main.jpg")
-    st.markdown(f'<div style="text-align:center;"><img src="data:image/jpeg;base64,{main_b64}" style="width:100%; height:auto;"></div>', unsafe_allow_html=True)
+    st.markdown(f'<img src="data:image/jpeg;base64,{main_b64}" style="width:100%; height:auto; display:block; margin: 0 auto;">', unsafe_allow_html=True)
 
 st.markdown(f"""
     <p class="eng-title">THE WEDDING OF</p>
@@ -93,7 +105,7 @@ st.divider()
 # 3. 인사말
 st.markdown('<p class="eng-title">Our Wedding</p>', unsafe_allow_html=True)
 st.markdown("""
-    <div style="font-size: 15px; line-height: 2.2; color: #444; text-align: center;">
+    <div style="font-size: 15px; line-height: 2.2; color: #444;">
         오랜 시간 소중한 이야기를 쌓아온<br>
         우리 두 사람, 결혼합니다.<br><br>
         변함없이 서로를 아끼며 살겠습니다.<br>
@@ -104,9 +116,9 @@ st.markdown("""
 
 st.divider()
 
-# 4. 연락처
+# 4. 연락처 (중앙 정렬 유지하며 가로 배치)
 st.markdown("""
-    <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; margin: 20px 0; font-family: 'Nanum Myeongjo', serif;">
+    <div class="contact-row" style="margin: 20px 0;">
         <div style="text-align: center; flex: 1;">
             <p style="font-weight: bold; font-size: 17px; margin-bottom: 5px;">신랑</p>
             <p style="font-size: 16px; margin-bottom: 10px;">김준태</p>
@@ -168,10 +180,10 @@ if existing_photos:
 
 st.divider()
 
-# 6. 장소 및 지도 (중앙 정렬 강화)
+# 6. 장소 및 지도
 st.markdown('<p class="eng-title">Location</p>', unsafe_allow_html=True)
 st.markdown("""
-    <div style="text-align: center; width: 100%; margin-bottom: 15px;">
+    <div style="margin-bottom: 15px;">
         <p style="font-size: 17px; font-weight: bold; color: #333333; margin-bottom: 5px;">웨딩시티 4층</p>
         <p style="color: #666; font-size: 14px;">서울 구로구 구로동 3-25 (신도림 테크노마트)</p>
     </div>
@@ -189,12 +201,12 @@ st.markdown('<div style="text-align: center; margin-top: 15px;"><a href="https:/
 st.divider()
 
 # 7. 축의금 복사
-st.markdown('<p style="font-size: 18px; text-align: center; margin-bottom: 20px;">마음 전하실 곳</p>', unsafe_allow_html=True)
+st.markdown('<p style="font-size: 18px; margin-bottom: 20px;">마음 전하실 곳</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
     acc_html = f"""
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; border-radius: 12px; margin-bottom: 12px; font-family: 'Nanum Myeongjo', serif;">
-        <div style="text-align: left;">
+        <div style="text-align: left; display: block;">
             <div style="font-size: 12px; color: #888; margin-bottom: 4px;">{title}</div>
             <div style="font-size: 15px; font-weight: bold; color: #333;">{account_number}</div>
         </div>
