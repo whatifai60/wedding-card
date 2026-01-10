@@ -130,7 +130,7 @@ if existing_photos:
     slider_content = f"""
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
-        .swiper {{ width: 100%; height: 450px; padding-bottom: 30px; }}
+        .swiper {{ width: 30%; height: 450px; padding-bottom: 30px; }}
         .swiper-slide {{ display: flex; justify-content: center; align-items: center; }}
         .swiper-pagination-bullet-active {{ background: #B2A59B !important; }}
     </style>
