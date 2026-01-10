@@ -113,7 +113,7 @@ if existing_photos:
             slidesPerView: "auto",
             spaceBetween: 20,
             autoplay: {{
-                delay: 2500,
+                delay: 1500,
                 disableOnInteraction: false,
             }},
             pagination: {{
