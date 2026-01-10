@@ -12,7 +12,7 @@ def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# 3. CSS 설정 (강력한 중앙 정렬 및 폰트 디테일)
+# 3. CSS 설정 (상단 노출되던 코드들을 style 태그 안으로 정리)
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
@@ -27,14 +27,14 @@ st.markdown("""
     /* 모든 마크다운 요소 강제 중앙 정렬 */
     div.stMarkdown, div.stMarkdown p, div.stText {
         text-align: center !important;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
     }
     
-    /* [수정] 메인 이름 크기 조절 (중간 사이즈: 26px) */
+    /* 메인 이름 크기 조절 */
     .main-names {
         display: block;
         text-align: center;
@@ -79,7 +79,6 @@ if os.path.exists("main.jpg"):
     main_b64 = get_image_base64("main.jpg")
     st.markdown(f'<div style="text-align:center;"><img src="data:image/jpeg;base64,{main_b64}" style="width:100%; height:auto;"></div>', unsafe_allow_html=True)
 
-# [수정] 이름 및 정보 중앙 정렬
 st.markdown(f"""
     <p class="eng-title">THE WEDDING OF</p>
     <div class="main-names">김준태 &nbsp; · &nbsp; 김경미</div>
@@ -105,7 +104,7 @@ st.markdown("""
 
 st.divider()
 
-# 4. 연락처 (레이아웃 깨짐 방지 위해 HTML 직접 작성)
+# 4. 연락처
 st.markdown("""
     <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; margin: 20px 0; font-family: 'Nanum Myeongjo', serif;">
         <div style="text-align: center; flex: 1;">
@@ -169,10 +168,10 @@ if existing_photos:
 
 st.divider()
 
-# 6. 장소 및 지도
+# 6. 장소 및 지도 (중앙 정렬 강화)
 st.markdown('<p class="eng-title">Location</p>', unsafe_allow_html=True)
 st.markdown("""
-    <div style="margin-bottom: 15px;">
+    <div style="text-align: center; width: 100%; margin-bottom: 15px;">
         <p style="font-size: 17px; font-weight: bold; color: #333333; margin-bottom: 5px;">웨딩시티 4층</p>
         <p style="color: #666; font-size: 14px;">서울 구로구 구로동 3-25 (신도림 테크노마트)</p>
     </div>
