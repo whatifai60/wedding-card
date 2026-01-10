@@ -11,7 +11,7 @@ def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# CSS 설정 (주석 없이 깨끗하게 정리)
+# CSS 설정
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
@@ -81,11 +81,12 @@ if os.path.exists("main.jpg"):
     main_b64 = get_image_base64("main.jpg")
     st.markdown(f'<div style="text-align:center;"><img src="data:image/jpeg;base64,{main_b64}" style="width:100%; height:auto;"></div>', unsafe_allow_html=True)
 
+# 메인 정보 수정 (8층으로 변경)
 st.markdown(f"""
     <div class="main-names">김준태 &nbsp; · &nbsp; 김경미</div>
     <div style="color: #333333; font-size: 16px; line-height: 1.6; font-weight: 500;">
         2026.05.10 SUN PM 1:20<br>
-        웨딩시티 4층
+        웨딩시티 8층
     </div>
     """, unsafe_allow_html=True)
 
@@ -158,15 +159,16 @@ st.divider()
 st.markdown('<p class="eng-title">Location</p>', unsafe_allow_html=True)
 st.markdown("""
     <div style="margin-bottom: 15px; text-align: center;">
-        <p style="font-size: 17px; font-weight: bold; color: #333333; margin-bottom: 5px;">웨딩시티 4층</p>
+        <p style="font-size: 17px; font-weight: bold; color: #333333; margin-bottom: 5px;">웨딩시티 8층</p>
         <p style="color: #666; font-size: 14px;">서울 구로구 구로동 3-25 (신도림 테크노마트)</p>
     </div>
     """, unsafe_allow_html=True)
 
+# 지도 정보 및 태그 수정 (8층으로 변경)
 m = folium.Map(location=[37.5070431, 126.8902185], zoom_start=17)
 folium.Marker(
     [37.5070431, 126.8902185], 
-    icon=folium.DivIcon(icon_size=(120,36), icon_anchor=(60,18), html='<div class="map-tag">웨딩시티 4층</div>')
+    icon=folium.DivIcon(icon_size=(120,36), icon_anchor=(60,18), html='<div class="map-tag">웨딩시티 8층</div>')
 ).add_to(m)
 st_folium(m, width="100%", height=350, returned_objects=[])
 
