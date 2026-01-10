@@ -16,13 +16,22 @@ def get_image_base64(path):
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-    /* 기본 배경 및 폰트 설정 */
-    .stApp { background-color: #F9F8F6; }
+    /* 전체 배경 및 기본 중앙 정렬 */
+    .stApp { 
+        background-color: #F9F8F6; 
+        text-align: center !important;
+    }
+    
     html, body, [data-testid="stAppViewContainer"] {
         font-family: 'Nanum Myeongjo', serif !important;
     }
 
-    /* 영문 주요 제목: Times New Roman 이탤릭 */
+    /* 모든 텍스트 기본 중앙 정렬 */
+    div.stMarkdown, p, div {
+        text-align: center !important;
+    }
+
+    /* 영문 제목 스타일 */
     .eng-title {
         font-family: 'Times New Roman', serif !important;
         font-style: italic !important; 
@@ -30,34 +39,29 @@ st.markdown("""
         color: #B2A59B !important; 
         margin-top: 30px !important; 
         margin-bottom: 10px !important;
-        text-align: center !important;
     }
 
-    /* 메인 이름 (중간 사이즈) */
+    /* 메인 이름 크기 */
     .main-names {
         font-weight: 700 !important;
         color: #333333 !important;
         font-size: 26px !important; 
         letter-spacing: 1px !important;
         margin: 10px 0 25px 0 !important;
-        text-align: center !important;
     }
 
-    /* 일반 텍스트 중앙 정렬 */
-    .center-text { text-align: center !important; }
-
-    /* [핵심] 신랑/신부 섹션 가로 정렬 강제 유지 */
+    /* [핵심] 신랑/신부 섹션 가로 배치 강제 고정 */
     .contact-container {
         display: flex !important;
-        flex-direction: row !important; /* 무조건 가로 */
-        justify-content: space-around !important;
+        flex-direction: row !important;
+        justify-content: center !important;
         align-items: flex-start !important;
         width: 100% !important;
         margin: 20px 0 !important;
     }
     .contact-box {
-        text-align: center !important;
         flex: 1 !important;
+        text-align: center !important;
     }
 
     /* 터치 회색 잔상 제거 */
@@ -83,13 +87,11 @@ if os.path.exists("main.jpg"):
     st.markdown(f'<div style="text-align:center;"><img src="data:image/jpeg;base64,{main_b64}" style="width:100%; height:auto;"></div>', unsafe_allow_html=True)
 
 st.markdown(f"""
-    <div class="center-text">
-        <p class="eng-title">THE WEDDING OF</p>
-        <div class="main-names">김준태 &nbsp; · &nbsp; 김경미</div>
-        <div style="color: #333333; font-size: 16px; line-height: 1.6; font-weight: 500;">
-            2026.05.10 SUN PM 1:20<br>
-            웨딩시티 4층
-        </div>
+    <p class="eng-title">THE WEDDING OF</p>
+    <div class="main-names">김준태 &nbsp; · &nbsp; 김경미</div>
+    <div style="color: #333333; font-size: 16px; line-height: 1.6; font-weight: 500;">
+        2026.05.10 SUN PM 1:20<br>
+        웨딩시티 4층
     </div>
     """, unsafe_allow_html=True)
 
@@ -98,7 +100,7 @@ st.divider()
 # 3. 인사말
 st.markdown('<p class="eng-title">Our Wedding</p>', unsafe_allow_html=True)
 st.markdown("""
-    <div style="font-size: 15px; line-height: 2.2; color: #444; text-align: center;">
+    <div style="font-size: 15px; line-height: 2.2; color: #444;">
         오랜 시간 소중한 이야기를 쌓아온<br>
         우리 두 사람, 결혼합니다.<br><br>
         변함없이 서로를 아끼며 살겠습니다.<br>
@@ -109,7 +111,7 @@ st.markdown("""
 
 st.divider()
 
-# 4. 연락처 (가로 정렬 고정)
+# 4. 연락처 (가로 배치 강제 고정)
 st.markdown("""
     <div class="contact-container">
         <div class="contact-box">
@@ -127,7 +129,7 @@ st.markdown("""
 
 st.divider()
 
-# 5. 갤러리 (자동 슬라이더)
+# 5. 갤러리 (이미지 잘림 방지 및 자동 재생)
 st.markdown('<p class="eng-title">Gallery</p>', unsafe_allow_html=True)
 existing_photos = [f"photo ({i}).jpg" for i in range(1, 31) if os.path.exists(f"photo ({i}).jpg")]
 
@@ -135,13 +137,14 @@ if existing_photos:
     slides_html = ""
     for photo in existing_photos:
         b64 = get_image_base64(photo)
-        slides_html += f'<div class="swiper-slide"><img src="data:image/jpeg;base64,{b64}" style="width:100%; border-radius:10px;"></div>'
+        # object-fit: contain으로 수정하여 전체가 다 보이게 함
+        slides_html += f'<div class="swiper-slide"><img src="data:image/jpeg;base64,{b64}" style="width:100%; height:100%; object-fit:contain; border-radius:10px;"></div>'
     
     slider_content = f"""
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
-        .swiper {{ width: 100%; padding-bottom: 30px; }}
-        .swiper-slide {{ display: flex; justify-content: center; align-items: center; width: 85%; }}
+        .swiper {{ width: 100%; height: 450px; padding-bottom: 30px; }}
+        .swiper-slide {{ display: flex; justify-content: center; align-items: center; width: 100%; }}
         .swiper-pagination-bullet-active {{ background: #B2A59B !important; }}
     </style>
     <div class="swiper mySwiper">
@@ -155,22 +158,20 @@ if existing_photos:
         var swiper = new Swiper(".mySwiper", {{
             loop: true,
             centeredSlides: true,
-            slidesPerView: "auto",
-            spaceBetween: 20,
             autoplay: {{ delay: 1500, disableOnInteraction: false }},
             speed: 1000,
             pagination: {{ el: ".swiper-pagination", clickable: true }},
         }});
     </script>
     """
-    st.components.v1.html(slider_content, height=500)
+    st.components.v1.html(slider_content, height=480)
 
 st.divider()
 
 # 6. 장소 및 지도
 st.markdown('<p class="eng-title">Location</p>', unsafe_allow_html=True)
 st.markdown("""
-    <div style="text-align: center; margin-bottom: 15px;">
+    <div style="margin-bottom: 15px;">
         <p style="font-size: 17px; font-weight: bold; color: #333333; margin-bottom: 5px;">웨딩시티 4층</p>
         <p style="color: #666; font-size: 14px;">서울 구로구 구로동 3-25 (신도림 테크노마트)</p>
     </div>
@@ -188,7 +189,7 @@ st.markdown('<div style="text-align: center; margin-top: 15px;"><a href="https:/
 st.divider()
 
 # 7. 축의금 복사
-st.markdown('<p style="font-size: 18px; text-align: center; margin-bottom: 20px;">마음 전하실 곳</p>', unsafe_allow_html=True)
+st.markdown('<p style="font-size: 18px; margin-bottom: 20px;">마음 전하실 곳</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
     acc_html = f"""
