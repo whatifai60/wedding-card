@@ -6,43 +6,41 @@ from streamlit_folium import st_folium
 # 1. 페이지 설정
 st.set_page_config(page_title="김준태 · 김경미 결혼식", page_icon="💍", layout="centered")
 
-# 2. 강력한 레이아웃 고정 CSS (모바일 3열 및 클릭 효과 제거)
+# 2. 초강력 레이아웃 고정 및 회색 잔상 제거 CSS
 st.markdown("""
     <style>
     .stApp { background-color: #F9F8F6; }
     div.stMarkdown { text-align: center; color: #333333; }
     
-    .eng-title {
-        font-family: 'Times New Roman', serif;
-        font-style: italic;
-        font-size: 26px;
-        color: #B2A59B;
-        margin-top: 30px;
-        margin-bottom: 10px;
+    /* [중요] 모든 클릭 회색 효과 제거 */
+    * {
+        -webkit-tap-highlight-color: transparent !important;
+        -webkit-touch-callout: none !important;
+        outline: none !important;
     }
 
-    /* 클릭 시 회색 잔상 제거 */
-    * { -webkit-tap-highlight-color: transparent !important; outline: none !important; }
-
-    /* [핵심] 모바일에서도 컬럼이 세로로 쌓이지 않고 옆으로 나란히 배치되게 함 */
+    /* [중요] 모바일에서도 강제로 가로 배치 (줄바꿈 방지) */
     [data-testid="column"] {
-        flex: 1 1 0% !important;
+        width: calc(33.333% - 1rem) !important;
+        flex: 1 1 calc(33.333% - 1rem) !important;
         min-width: 0px !important;
     }
+    
+    /* 신랑/신부 섹션은 2열이므로 별도 처리 */
+    div[data-testid="stHorizontalBlock"] > div:nth-child(1),
+    div[data-testid="stHorizontalBlock"] > div:nth-child(2) {
+        /* 신랑 신부 열은 50%씩 */
+    }
 
-    /* 갤러리 이미지 정사각형 및 간격 설정 */
+    /* 갤러리 이미지 정사각형 고정 */
     [data-testid="stImage"] img {
         border-radius: 5px;
         aspect-ratio: 1 / 1;
         object-fit: cover;
     }
 
-    /* 메인 이미지는 비율 유지 */
-    .main-img img {
-        aspect-ratio: auto !important;
-    }
+    .main-img img { aspect-ratio: auto !important; }
 
-    /* 복사 버튼 스타일 */
     .copy-btn {
         background-color: #333333;
         color: white;
@@ -53,8 +51,16 @@ st.markdown("""
         font-weight: bold;
         cursor: pointer;
     }
+
+    .eng-title {
+        font-family: 'Times New Roman', serif;
+        font-style: italic;
+        font-size: 26px;
+        color: #B2A59B;
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
     
-    /* 지도 마커 깨짐 방지 */
     .leaflet-marker-icon, .leaflet-marker-shadow { display: none !important; }
     </style>
     """, unsafe_allow_html=True)
@@ -82,7 +88,8 @@ st.markdown('<div style="font-size: 16px; line-height: 2.2; color: #444;">오랜
 
 st.divider()
 
-# 4. 연락처 (모바일 2열 고정)
+# 4. 연락처 (나란히 배치)
+# st.columns(2)를 쓰되 CSS에서 세로 쌓기를 막았습니다.
 c1, c2 = st.columns(2)
 with c1:
     st.markdown('<div style="text-align: center;"><p style="font-weight: bold; font-size: 18px;">신랑</p><p style="font-size: 16px;">김준태</p><p style="font-size: 14px; color: #777;">부 김종우<br>모 김미나</p></div>', unsafe_allow_html=True)
@@ -91,7 +98,7 @@ with c2:
 
 st.divider()
 
-# 5. 갤러리 (모바일 3열 고정)
+# 5. 갤러리 (강제 3열)
 st.markdown('<p class="eng-title">Gallery</p>', unsafe_allow_html=True)
 existing_photos = [f"photo ({i}).jpg" for i in range(1, 31) if os.path.exists(f"photo ({i}).jpg")]
 
@@ -115,7 +122,7 @@ st.markdown('<div style="text-align: center; margin-top: 15px;"><a href="https:/
 
 st.divider()
 
-# 7. 축의금 및 복사 (절대 실패 없는 인라인 자바스크립트)
+# 7. 축의금 복사
 st.markdown('<p style="font-size: 20px; text-align: center;">마음 전하실 곳</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
