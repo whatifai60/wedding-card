@@ -6,63 +6,68 @@ from streamlit_folium import st_folium
 # 1. 페이지 설정
 st.set_page_config(page_title="김준태 · 김경미 결혼식", page_icon="💍", layout="centered")
 
-# 2. 강력한 레이아웃 고정 및 클릭 잔상 제거 CSS
+# 2. 기기별 레이아웃 최적화 CSS
 st.markdown("""
     <style>
+    /* 공통 스타일 */
     .stApp { background-color: #F9F8F6; }
     div.stMarkdown { text-align: center; color: #333333; }
-    
-    /* 클릭 시 회색 잔상 제거 */
-    * {
-        -webkit-tap-highlight-color: transparent !important;
-        outline: none !important;
-    }
-
-    /* 모바일/PC 강제 3열 고정 (Streamlit 기본 줄바꿈 방지) */
-    [data-testid="stHorizontalBlock"] {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: wrap !important;
-        align-items: flex-start !important;
-    }
-    [data-testid="column"] {
-        flex: 1 1 30% !important; /* 3열 기준 */
-        min-width: 30% !important;
-    }
-    
-    /* 신랑/신부 섹션은 2열이므로 50% 적용 */
-    .contact-section [data-testid="column"] {
-        flex: 1 1 45% !important;
-        min-width: 45% !important;
-    }
-
-    /* 갤러리 이미지 정사각형 최적화 */
-    [data-testid="stImage"] img {
-        border-radius: 5px;
-        aspect-ratio: 1 / 1;
-        object-fit: cover;
-    }
-    .main-img img { aspect-ratio: auto !important; }
-
     .eng-title {
         font-family: 'Times New Roman', serif;
-        font-style: italic; font-size: 26px;
-        color: #B2A59B; margin-top: 30px; margin-bottom: 10px;
+        font-style: italic;
+        font-size: 26px;
+        color: #B2A59B;
+        margin-top: 30px;
+        margin-bottom: 10px;
     }
+    
+    /* [핵심] 클릭 시 회색 하이라이트 제거 */
+    * { -webkit-tap-highlight-color: transparent !important; outline: none !important; }
+
+    /* [핵심] 모바일/PC 판별 및 갤러리 3열 강제 고정 */
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 무조건 3열 */
+        gap: 8px;
+        width: 100%;
+        margin-top: 20px;
+    }
+    .gallery-grid img {
+        width: 100%;
+        aspect-ratio: 1 / 1; /* 정사각형 유지 */
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    /* 연락처 섹션 모바일 대응 (옆으로 나란히) */
+    .contact-row {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        width: 100%;
+        margin: 20px 0;
+    }
+
+    /* 복사 버튼 스타일 */
     .copy-btn {
-        background-color: #333333; color: white; border: none;
-        padding: 8px 15px; border-radius: 20px; font-size: 13px;
-        font-weight: bold; cursor: pointer;
+        background-color: #333333;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
     }
+    
+    /* 지도 마커 깨짐 방지 */
     .leaflet-marker-icon, .leaflet-marker-shadow { display: none !important; }
     </style>
     """, unsafe_allow_html=True)
 
-# 2. 메인 섹션
+# 2. 메인 이미지
 if os.path.exists("main.jpg"):
-    st.markdown('<div class="main-img">', unsafe_allow_html=True)
     st.image("main.jpg", use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("""
     <div style="text-align: center;">
@@ -81,31 +86,45 @@ st.markdown('<div style="font-size: 16px; line-height: 2.2; color: #444;">오랜
 
 st.divider()
 
-# 4. 연락처 (나란히 배치)
-st.markdown('<div class="contact-section">', unsafe_allow_html=True)
-c1, c2 = st.columns(2)
-with c1:
-    st.markdown('<div style="text-align: center;"><p style="font-weight: bold; font-size: 18px;">신랑</p><p style="font-size: 16px;">김준태</p><p style="font-size: 14px; color: #777;">부 김종우<br>모 김미나</p></div>', unsafe_allow_html=True)
-with c2:
-    st.markdown('<div style="text-align: center;"><p style="font-weight: bold; font-size: 18px;">신부</p><p style="font-size: 16px;">김경미</p><p style="font-size: 14px; color: #777;">부 김봉욱<br>모 남회숙</p></div>', unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
+# 4. 연락처 (HTML 직접 구성으로 모바일 2열 고정)
+st.markdown("""
+    <div class="contact-row">
+        <div style="text-align: center;">
+            <p style="font-weight: bold; font-size: 18px;">신랑</p>
+            <p style="font-size: 16px;">김준태</p>
+            <p style="font-size: 14px; color: #777;">부 김종우<br>모 김미나</p>
+        </div>
+        <div style="text-align: center;">
+            <p style="font-weight: bold; font-size: 18px;">신부</p>
+            <p style="font-size: 16px;">김경미</p>
+            <p style="font-size: 14px; color: #777;">부 김봉욱<br>모 남회숙</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.divider()
 
-# 5. 갤러리 (로딩 성능 최적화)
+# 5. 갤러리 (HTML Grid 방식으로 무조건 3열 유지)
 st.markdown('<p class="eng-title">Gallery</p>', unsafe_allow_html=True)
 existing_photos = [f"photo ({i}).jpg" for i in range(1, 31) if os.path.exists(f"photo ({i}).jpg")]
 
 if existing_photos:
-    cols = st.columns(3)
-    for idx, photo_path in enumerate(existing_photos):
-        with cols[idx % 3]:
-            # 로딩 부하를 줄이기 위해 이미지 출력
-            st.image(photo_path, use_container_width=True)
+    # Streamlit 기본 image 대신 직접 HTML 태그를 생성하여 3열 고정
+    import base64
+    def get_image_base64(path):
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+
+    gallery_items = ""
+    for photo in existing_photos:
+        b64 = get_image_base64(photo)
+        gallery_items += f'<img src="data:image/jpeg;base64,{b64}">'
+    
+    st.markdown(f'<div class="gallery-grid">{gallery_items}</div>', unsafe_allow_html=True)
 
 st.divider()
 
-# 6. 장소 및 지도
+# 6. 장소
 st.markdown('<p class="eng-title">Location</p>', unsafe_allow_html=True)
 st.markdown('<p style="font-size: 18px; font-weight: bold; color: #333333;">웨딩시티 4층</p><p style="color: #666;">서울 구로구 구로동 3-25 (신도림 테크노마트)</p>', unsafe_allow_html=True)
 
@@ -117,7 +136,7 @@ st.markdown('<div style="text-align: center; margin-top: 15px;"><a href="https:/
 
 st.divider()
 
-# 7. 축의금 복사
+# 7. 축의금 및 복사 (HTML/JS 결합형 최종)
 st.markdown('<p style="font-size: 20px; text-align: center;">마음 전하실 곳</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
@@ -127,7 +146,7 @@ def account_row(title, account_number):
                 <span style="font-size: 13px; color: #888;">{title}</span><br>
                 <span style="font-size: 16px; font-weight: bold; color: #333;">{account_number}</span>
             </div>
-            <button class="copy-btn" onclick="const el = document.createElement('textarea'); el.value = '{account_number}'; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert('계좌번호가 복사되었습니다!');">복사</button>
+            <button class="copy-btn" onclick="const el = document.createElement('textarea'); el.value = '{account_number}'; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert('복사되었습니다: {account_number}');">복사</button>
         </div>
     """, unsafe_allow_html=True)
 
