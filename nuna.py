@@ -12,45 +12,42 @@ def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# 3. CSS 설정
+# 3. CSS 및 슬라이더 설정
 st.markdown("""
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
     <style>
     .stApp { background-color: #F9F8F6; }
     div.stMarkdown { text-align: center; color: #333333; }
     
-    /* 터치 시 회색 잔상 제거 */
-    * {
-        -webkit-tap-highlight-color: transparent !important;
-        outline: none !important;
+    * { -webkit-tap-highlight-color: transparent !important; outline: none !important; }
+
+    .eng-title {
+        font-family: 'Times New Roman', serif;
+        font-style: italic; font-size: 26px;
+        color: #B2A59B; margin-top: 30px; margin-bottom: 10px;
     }
 
-    /* 지도 태그 가로 한 줄 고정 */
-    .map-tag {
-        background-color: #333333 !important;
-        color: white !important;
-        text-align: center !important;
-        line-height: 34px !important;
-        font-size: 14px !important;
-        font-weight: bold !important;
-        border-radius: 18px !important;
-        border: 2px solid white !important;
-        width: 120px !important;
-        white-space: nowrap !important;
-        display: block !important;
-    }
-
-    .gallery-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
+    /* 슬라이더 컨테이너 */
+    .swiper {
+        width: 100%;
+        height: auto;
         margin: 20px 0;
     }
-    .gallery-grid img {
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        object-fit: cover;
-        border-radius: 5px;
+    .swiper-slide {
+        width: 80% !important; /* 다음 이미지가 살짝 보이게 설정 */
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
+    .swiper-slide img {
+        width: 100%;
+        border-radius: 10px;
+        object-fit: contain;
+    }
+    
+    /* 계좌번호 펼침 효과 제거용 CSS */
+    .stExpander { border: none !important; box-shadow: none !important; }
 
     .contact-row {
         display: flex;
@@ -60,17 +57,20 @@ st.markdown("""
         margin: 20px 0;
     }
 
-    .eng-title {
-        font-family: 'Times New Roman', serif;
-        font-style: italic; font-size: 26px;
-        color: #B2A59B; margin-top: 30px; margin-bottom: 10px;
+    .map-tag {
+        background-color: #333333 !important; color: white !important;
+        text-align: center !important; line-height: 34px !important;
+        font-size: 14px !important; font-weight: bold !important;
+        border-radius: 18px !important; border: 2px solid white !important;
+        width: 120px !important; white-space: nowrap !important;
+        display: block !important;
     }
     
     .leaflet-marker-icon, .leaflet-marker-shadow { display: none !important; }
     </style>
     """, unsafe_allow_html=True)
 
-# 2. 메인 이미지 (Base64)
+# 2. 메인 이미지
 if os.path.exists("main.jpg"):
     main_b64 = get_image_base64("main.jpg")
     st.markdown(f'<img src="data:image/jpeg;base64,{main_b64}" style="width:100%; height:auto;">', unsafe_allow_html=True)
@@ -110,16 +110,40 @@ st.markdown("""
 
 st.divider()
 
-# 5. 갤러리 (Base64)
+# 5. 갤러리 (자동 무한 루프 슬라이더)
 st.markdown('<p class="eng-title">Gallery</p>', unsafe_allow_html=True)
 existing_photos = [f"photo ({i}).jpg" for i in range(1, 31) if os.path.exists(f"photo ({i}).jpg")]
 
 if existing_photos:
-    gallery_items = ""
+    slides_html = ""
     for photo in existing_photos:
         b64 = get_image_base64(photo)
-        gallery_items += f'<img src="data:image/jpeg;base64,{b64}">'
-    st.markdown(f'<div class="gallery-grid">{gallery_items}</div>', unsafe_allow_html=True)
+        slides_html += f'<div class="swiper-slide"><img src="data:image/jpeg;base64,{b64}"></div>'
+    
+    slider_html = f"""
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+            {slides_html}
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        var swiper = new Swiper(".mySwiper", {{
+            loop: true,
+            speed: 5000,           /* 움직이는 속도 (5초 동안 한바퀴 느낌) */
+            slidesPerView: "auto", /* 이미지 크기에 맞춰 조절 */
+            centeredSlides: true,
+            spaceBetween: 20,
+            autoplay: {{
+                delay: 0,          /* 딜레이 없음 */
+                disableOnInteraction: false,
+            }},
+            freeMode: true,        /* 부드러운 움직임 활성화 */
+        }});
+    </script>
+    """
+    st.components.v1.html(slider_html, height=450)
 
 st.divider()
 
@@ -130,11 +154,7 @@ st.markdown('<p style="font-size: 18px; font-weight: bold; color: #333333;">웨�
 m = folium.Map(location=[37.5070431, 126.8902185], zoom_start=17)
 folium.Marker(
     [37.5070431, 126.8902185], 
-    icon=folium.DivIcon(
-        icon_size=(120,36), 
-        icon_anchor=(60,18), 
-        html='<div class="map-tag">웨딩시티 4층</div>'
-    )
+    icon=folium.DivIcon(icon_size=(120,36), icon_anchor=(60,18), html='<div class="map-tag">웨딩시티 4층</div>')
 ).add_to(m)
 st_folium(m, width="100%", height=350, returned_objects=[])
 
@@ -142,7 +162,7 @@ st.markdown('<div style="text-align: center; margin-top: 15px;"><a href="https:/
 
 st.divider()
 
-# 7. 축의금 복사 (알림창 제거 버전)
+# 7. 축의금 복사
 st.markdown('<p style="font-size: 20px; text-align: center;">마음 전하실 곳</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
@@ -157,7 +177,6 @@ def account_row(title, account_number):
             border-radius: 18px; font-size: 12px; font-weight: bold; cursor: pointer;
             transition: all 0.2s; -webkit-tap-highlight-color: transparent;
         }}
-        /* 클릭 시 색상 변화로 피드백 전달 */
         .btn:active {{ background-color: #03C75A; transform: scale(0.9); }}
     </style>
     <div class="row">
@@ -175,8 +194,6 @@ def account_row(title, account_number):
             t.select();
             document.execCommand('copy');
             document.body.removeChild(t);
-            
-            // 알림창 대신 버튼 텍스트를 잠시 바꿈
             const originalText = btn.innerText;
             btn.innerText = '완료';
             setTimeout(() => {{ btn.innerText = originalText; }}, 1000);
