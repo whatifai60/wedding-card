@@ -4,44 +4,32 @@ import folium
 import base64
 from streamlit_folium import st_folium
 
-# 1. 페이지 설정
 st.set_page_config(page_title="김준태 · 김경미 결혼식", page_icon="💍", layout="centered")
 
-# 2. 이미지 Base64 변환 함수
 def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# 3. CSS 설정 (오타 방지를 위해 모든 스타일을 하나의 <style> 태그 안에 완벽히 가둠)
+# 모든 스타일을 주석 없이 깨끗하게 정리했습니다.
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-    /* 1. 기본 배경 및 폰트 */
-    .stApp { 
-        background-color: #F9F8F6; 
-    }
+    .stApp { background-color: #F9F8F6; }
     html, body, [data-testid="stAppViewContainer"] {
         font-family: 'Nanum Myeongjo', serif !important;
         text-align: center !important;
     }
-
-    /* 2. 모든 텍스트 기본 중앙 정렬 */
     div.stMarkdown, p, div {
         text-align: center !important;
     }
-
-    /* 3. 영문 제목 스타일 (Times New Roman) */
     .eng-title {
         font-family: 'Times New Roman', serif !important;
         font-style: italic !important; 
         font-size: 24px !important;
         color: #B2A59B !important; 
-        margin-top: 30px !important; 
-        margin-bottom: 10px !important;
+        margin: 30px 0 10px 0 !important;
         display: block !important;
     }
-
-    /* 4. 메인 이름 (중간 사이즈) */
     .main-names {
         font-family: 'Nanum Myeongjo', serif !important;
         font-weight: 700 !important;
@@ -51,8 +39,6 @@ st.markdown("""
         margin: 10px 0 25px 0 !important;
         text-align: center !important;
     }
-
-    /* 5. 신랑/신부 섹션 가로 배치 고정 */
     .contact-container {
         display: flex !important;
         flex-direction: row !important;
@@ -65,14 +51,10 @@ st.markdown("""
         flex: 1 !important;
         text-align: center !important;
     }
-
-    /* 6. 터치 회색 잔상 제거 */
     * { 
         -webkit-tap-highlight-color: transparent !important; 
         outline: none !important; 
     }
-
-    /* 7. 지도 태그 스타일 */
     .map-tag {
         background-color: #333333 !important; 
         color: white !important;
@@ -86,15 +68,11 @@ st.markdown("""
         white-space: nowrap !important;
         display: block !important;
     }
-    
     .leaflet-marker-icon, .leaflet-marker-shadow { display: none !important; }
-
-    /* 구분선 */
     hr { margin: 40px 0 !important; }
     </style>
     """, unsafe_allow_html=True)
 
-# 2. 메인 이미지
 if os.path.exists("main.jpg"):
     main_b64 = get_image_base64("main.jpg")
     st.markdown(f'<div style="text-align:center;"><img src="data:image/jpeg;base64,{main_b64}" style="width:100%; height:auto;"></div>', unsafe_allow_html=True)
@@ -110,7 +88,6 @@ st.markdown(f"""
 
 st.divider()
 
-# 3. 인사말
 st.markdown('<p class="eng-title">Our Wedding</p>', unsafe_allow_html=True)
 st.markdown("""
     <div style="font-size: 15px; line-height: 2.2; color: #444;">
@@ -124,7 +101,6 @@ st.markdown("""
 
 st.divider()
 
-# 4. 연락처 (가로 배치 강제 고정)
 st.markdown("""
     <div class="contact-container">
         <div class="contact-box">
@@ -142,7 +118,6 @@ st.markdown("""
 
 st.divider()
 
-# 5. 갤러리 (이미지 잘림 방지 및 자동 재생)
 st.markdown('<p class="eng-title">Gallery</p>', unsafe_allow_html=True)
 existing_photos = [f"photo ({i}).jpg" for i in range(1, 31) if os.path.exists(f"photo ({i}).jpg")]
 
@@ -160,16 +135,13 @@ if existing_photos:
         .swiper-pagination-bullet-active {{ background: #B2A59B !important; }}
     </style>
     <div class="swiper mySwiper">
-        <div class="swiper-wrapper">
-            {slides_html}
-        </div>
+        <div class="swiper-wrapper">{slides_html}</div>
         <div class="swiper-pagination"></div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         var swiper = new Swiper(".mySwiper", {{
-            loop: true,
-            centeredSlides: true,
+            loop: true, centeredSlides: true,
             autoplay: {{ delay: 1500, disableOnInteraction: false }},
             speed: 1000,
             pagination: {{ el: ".swiper-pagination", clickable: true }},
@@ -180,7 +152,6 @@ if existing_photos:
 
 st.divider()
 
-# 6. 장소 및 지도
 st.markdown('<p class="eng-title">Location</p>', unsafe_allow_html=True)
 st.markdown("""
     <div style="margin-bottom: 15px; text-align: center;">
@@ -200,7 +171,6 @@ st.markdown('<div style="text-align: center; margin-top: 15px;"><a href="https:/
 
 st.divider()
 
-# 7. 축의금 복사
 st.markdown('<p style="font-size: 18px; text-align: center; margin-bottom: 20px;">마음 전하실 곳</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
@@ -215,14 +185,9 @@ def account_row(title, account_number):
     <script>
         function copyAcc(val, btn) {{
             const t = document.createElement('textarea');
-            t.value = val;
-            document.body.appendChild(t);
-            t.select();
-            document.execCommand('copy');
-            document.body.removeChild(t);
-            const ori = btn.innerText;
-            btn.innerText = '완료';
-            btn.style.backgroundColor = '#03C75A';
+            t.value = val; document.body.appendChild(t);
+            t.select(); document.execCommand('copy'); document.body.removeChild(t);
+            const ori = btn.innerText; btn.innerText = '완료'; btn.style.backgroundColor = '#03C75A';
             setTimeout(() => {{ btn.innerText = ori; btn.style.backgroundColor = '#333'; }}, 1000);
         }}
     </script>
