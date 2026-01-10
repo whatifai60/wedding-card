@@ -12,50 +12,56 @@ def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# 3. CSS 설정 (상단 노출되던 코드들을 style 태그 안으로 정리)
+# 3. CSS 설정
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-    /* 전체 폰트 및 중앙 정렬 */
+    /* 기본 배경 및 폰트 설정 */
+    .stApp { background-color: #F9F8F6; }
     html, body, [data-testid="stAppViewContainer"] {
         font-family: 'Nanum Myeongjo', serif !important;
-        text-align: center !important;
     }
-    
-    .stApp { background-color: #F9F8F6; }
 
-    /* 모든 마크다운 요소 강제 중앙 정렬 */
-    div.stMarkdown, div.stMarkdown p, div.stText {
+    /* 영문 주요 제목: Times New Roman 이탤릭 */
+    .eng-title {
+        font-family: 'Times New Roman', serif !important;
+        font-style: italic !important; 
+        font-size: 24px !important;
+        color: #B2A59B !important; 
+        margin-top: 30px !important; 
+        margin-bottom: 10px !important;
         text-align: center !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        width: 100% !important;
     }
-    
-    /* 메인 이름 크기 조절 */
+
+    /* 메인 이름 (중간 사이즈) */
     .main-names {
-        display: block;
-        text-align: center;
-        width: 100%;
-        margin: 10px 0 25px 0;
-        font-weight: 700;
-        color: #333333;
-        font-size: 26px; 
-        letter-spacing: 1px;
+        font-weight: 700 !important;
+        color: #333333 !important;
+        font-size: 26px !important; 
+        letter-spacing: 1px !important;
+        margin: 10px 0 25px 0 !important;
+        text-align: center !important;
+    }
+
+    /* 일반 텍스트 중앙 정렬 */
+    .center-text { text-align: center !important; }
+
+    /* [핵심] 신랑/신부 섹션 가로 정렬 강제 유지 */
+    .contact-container {
+        display: flex !important;
+        flex-direction: row !important; /* 무조건 가로 */
+        justify-content: space-around !important;
+        align-items: flex-start !important;
+        width: 100% !important;
+        margin: 20px 0 !important;
+    }
+    .contact-box {
+        text-align: center !important;
+        flex: 1 !important;
     }
 
     /* 터치 회색 잔상 제거 */
     * { -webkit-tap-highlight-color: transparent !important; outline: none !important; }
-
-    .eng-title {
-        font-family: 'Times New Roman', serif;
-        font-style: italic; font-size: 24px;
-        color: #B2A59B; margin-top: 30px; margin-bottom: 5px;
-        text-align: center;
-        width: 100%;
-    }
 
     /* 지도 태그 스타일 */
     .map-tag {
@@ -68,9 +74,6 @@ st.markdown("""
     }
     
     .leaflet-marker-icon, .leaflet-marker-shadow { display: none !important; }
-    
-    /* 구분선 중앙 정렬 */
-    hr { margin-left: auto !important; margin-right: auto !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -80,11 +83,13 @@ if os.path.exists("main.jpg"):
     st.markdown(f'<div style="text-align:center;"><img src="data:image/jpeg;base64,{main_b64}" style="width:100%; height:auto;"></div>', unsafe_allow_html=True)
 
 st.markdown(f"""
-    <p class="eng-title">THE WEDDING OF</p>
-    <div class="main-names">김준태 &nbsp; · &nbsp; 김경미</div>
-    <div style="color: #333333; font-size: 16px; line-height: 1.6; font-weight: 500;">
-        2026.05.10 SUN PM 1:20<br>
-        웨딩시티 4층
+    <div class="center-text">
+        <p class="eng-title">THE WEDDING OF</p>
+        <div class="main-names">김준태 &nbsp; · &nbsp; 김경미</div>
+        <div style="color: #333333; font-size: 16px; line-height: 1.6; font-weight: 500;">
+            2026.05.10 SUN PM 1:20<br>
+            웨딩시티 4층
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -104,15 +109,15 @@ st.markdown("""
 
 st.divider()
 
-# 4. 연락처
+# 4. 연락처 (가로 정렬 고정)
 st.markdown("""
-    <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; margin: 20px 0; font-family: 'Nanum Myeongjo', serif;">
-        <div style="text-align: center; flex: 1;">
+    <div class="contact-container">
+        <div class="contact-box">
             <p style="font-weight: bold; font-size: 17px; margin-bottom: 5px;">신랑</p>
             <p style="font-size: 16px; margin-bottom: 10px;">김준태</p>
             <p style="font-size: 13px; color: #777; line-height: 1.5;">부 김종우<br>모 김미나</p>
         </div>
-        <div style="text-align: center; flex: 1;">
+        <div class="contact-box">
             <p style="font-weight: bold; font-size: 17px; margin-bottom: 5px;">신부</p>
             <p style="font-size: 16px; margin-bottom: 10px;">김경미</p>
             <p style="font-size: 13px; color: #777; line-height: 1.5;">부 김봉욱<br>모 남회숙</p>
@@ -122,7 +127,7 @@ st.markdown("""
 
 st.divider()
 
-# 5. 갤러리 (자동 무한 루프 슬라이더)
+# 5. 갤러리 (자동 슬라이더)
 st.markdown('<p class="eng-title">Gallery</p>', unsafe_allow_html=True)
 existing_photos = [f"photo ({i}).jpg" for i in range(1, 31) if os.path.exists(f"photo ({i}).jpg")]
 
@@ -152,15 +157,9 @@ if existing_photos:
             centeredSlides: true,
             slidesPerView: "auto",
             spaceBetween: 20,
-            autoplay: {{
-                delay: 1500,
-                disableOnInteraction: false,
-            }},
+            autoplay: {{ delay: 1500, disableOnInteraction: false }},
             speed: 1000,
-            pagination: {{
-                el: ".swiper-pagination",
-                clickable: true,
-            }},
+            pagination: {{ el: ".swiper-pagination", clickable: true }},
         }});
     </script>
     """
@@ -168,10 +167,10 @@ if existing_photos:
 
 st.divider()
 
-# 6. 장소 및 지도 (중앙 정렬 강화)
+# 6. 장소 및 지도
 st.markdown('<p class="eng-title">Location</p>', unsafe_allow_html=True)
 st.markdown("""
-    <div style="text-align: center; width: 100%; margin-bottom: 15px;">
+    <div style="text-align: center; margin-bottom: 15px;">
         <p style="font-size: 17px; font-weight: bold; color: #333333; margin-bottom: 5px;">웨딩시티 4층</p>
         <p style="color: #666; font-size: 14px;">서울 구로구 구로동 3-25 (신도림 테크노마트)</p>
     </div>
@@ -198,7 +197,7 @@ def account_row(title, account_number):
             <div style="font-size: 12px; color: #888; margin-bottom: 4px;">{title}</div>
             <div style="font-size: 15px; font-weight: bold; color: #333;">{account_number}</div>
         </div>
-        <button onclick="copyAcc('{account_number}', this)" style="background-color: #333; color: white; border: none; padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;">복사</button>
+        <button onclick="copyAcc('{account_number}', this)" style="background-color: #333; color: white; border: none; padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;">복사</button>
     </div>
     <script>
         function copyAcc(val, btn) {{
