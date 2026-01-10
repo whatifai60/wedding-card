@@ -4,13 +4,14 @@ import folium
 import base64
 from streamlit_folium import st_folium
 
-st.set_page_config(page_title="김준태 · 김경미 결혼식", page_icon="💍", layout="centered")
+# 1. 페이지 설정 (미리보기 제목 수정)
+st.set_page_config(page_title="준태 경미 결혼합니다", page_icon="💍", layout="centered")
 
 def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# 모든 스타일을 주석 없이 깨끗하게 정리했습니다.
+# CSS 설정 (주석 없이 깨끗하게 정리)
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
@@ -73,12 +74,14 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+# THE WEDDING OF 문구를 메인 사진 위로 배치
+st.markdown('<p class="eng-title">THE WEDDING OF</p>', unsafe_allow_html=True)
+
 if os.path.exists("main.jpg"):
     main_b64 = get_image_base64("main.jpg")
     st.markdown(f'<div style="text-align:center;"><img src="data:image/jpeg;base64,{main_b64}" style="width:100%; height:auto;"></div>', unsafe_allow_html=True)
 
 st.markdown(f"""
-    <p class="eng-title">THE WEDDING OF</p>
     <div class="main-names">김준태 &nbsp; · &nbsp; 김경미</div>
     <div style="color: #333333; font-size: 16px; line-height: 1.6; font-weight: 500;">
         2026.05.10 SUN PM 1:20<br>
@@ -171,7 +174,8 @@ st.markdown('<div style="text-align: center; margin-top: 15px;"><a href="https:/
 
 st.divider()
 
-st.markdown('<p style="font-size: 18px; text-align: center; margin-bottom: 20px;">마음 전하실 곳</p>', unsafe_allow_html=True)
+# 축의금 문구 수정
+st.markdown('<p style="font-size: 16px; text-align: center; margin-bottom: 20px; color: #444;">축복의 의미로 축의금을 전달해보세요</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
     acc_html = f"""
