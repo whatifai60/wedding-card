@@ -5,7 +5,7 @@ import base64
 from streamlit_folium import st_folium
 
 # 1. 페이지 설정 (미리보기 제목 수정)
-st.set_page_config(page_title="준태 경미 결혼합니다", page_icon="💍", layout="centered")
+st.set_page_config(page_title="준태 경미 결혼합니다", page_icon=" ", layout="centered")
 
 def get_image_base64(path):
     with open(path, "rb") as f:
