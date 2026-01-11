@@ -4,6 +4,18 @@ import folium
 import base64
 from streamlit_folium import st_folium
 
+
+# --- 미리보기(OG Tag) 설정 ---
+# 이 부분은 페이지 소스 코드에 직접 삽입되어 카카오톡 등이 읽어가는 정보입니다.
+st.markdown(f"""
+    <head>
+        <meta property="og:title" content="준태 & 경미 결혼합니다" />
+        <meta property="og:description" content="2026년 5월 10일 오후 1시 20분, 웨딩시티 8층" />
+        <meta property="og:image" content="https://your-website-url.com/main.jpg" />
+        <meta property="og:url" content="https://your-website-url.com" />
+    </head>
+    """, unsafe_allow_html=True)
+
 # 1. 페이지 설정 (미리보기 제목 수정)
 st.set_page_config(page_title="준태 경미 결혼합니다", page_icon=" ", layout="centered")
 
