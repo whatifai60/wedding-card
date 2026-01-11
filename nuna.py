@@ -11,8 +11,6 @@ st.markdown(f"""
     <head>
         <meta property="og:title" content="준태 & 경미 결혼합니다" />
         <meta property="og:description" content="2026년 5월 10일 오후 1시 20분, 웨딩시티 8층" />
-        <meta property="og:image" content="https://your-website-url.com/main.jpg" />
-        <meta property="og:url" content="https://your-website-url.com" />
     </head>
     """, unsafe_allow_html=True)
 
