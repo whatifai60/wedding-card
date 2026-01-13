@@ -25,7 +25,7 @@ def get_image_base64(path):
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-    .stApp { background-color: #F9F8F6; }
+    .stApp { background-color: #FFFFFF; }
     html, body, [data-testid="stAppViewContainer"] {
         font-family: 'Nanum Myeongjo', serif !important;
         text-align: center !important;
