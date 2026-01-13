@@ -4,7 +4,9 @@ import folium
 import base64
 from streamlit_folium import st_folium
 
+
 # --- 미리보기(OG Tag) 설정 ---
+# 이 부분은 페이지 소스 코드에 직접 삽입되어 카카오톡 등이 읽어가는 정보입니다.
 st.markdown(f"""
     <head>
         <meta property="og:title" content="준태 & 경미 결혼합니다" />
@@ -12,30 +14,25 @@ st.markdown(f"""
     </head>
     """, unsafe_allow_html=True)
 
-# 1. 페이지 설정
-st.set_page_config(page_title="준태 경미 결혼합니다", page_icon="💍", layout="centered")
+# 1. 페이지 설정 (미리보기 제목 수정)
+st.set_page_config(page_title="준태 경미 결혼합니다", page_icon=" ", layout="centered")
 
 def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# CSS 설정 (배경색 ffffff 적용 및 스타일 정리)
+# CSS 설정
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-    /* [수정] 배경색을 완전한 흰색으로 변경 */
-    .stApp { background-color: #ffffff; }
-    
+    .stApp { background-color: #F9F8F6; }
     html, body, [data-testid="stAppViewContainer"] {
         font-family: 'Nanum Myeongjo', serif !important;
         text-align: center !important;
-        background-color: #ffffff !important;
     }
-    
     div.stMarkdown, p, div {
         text-align: center !important;
     }
-    
     .eng-title {
         font-family: 'Times New Roman', serif !important;
         font-style: italic !important; 
@@ -44,7 +41,6 @@ st.markdown("""
         margin: 30px 0 10px 0 !important;
         display: block !important;
     }
-    
     .main-names {
         font-family: 'Nanum Myeongjo', serif !important;
         font-weight: 700 !important;
@@ -54,7 +50,6 @@ st.markdown("""
         margin: 10px 0 25px 0 !important;
         text-align: center !important;
     }
-    
     .contact-container {
         display: flex !important;
         flex-direction: row !important;
@@ -63,17 +58,14 @@ st.markdown("""
         width: 100% !important;
         margin: 20px 0 !important;
     }
-    
     .contact-box {
         flex: 1 !important;
         text-align: center !important;
     }
-    
     * { 
         -webkit-tap-highlight-color: transparent !important; 
         outline: none !important; 
     }
-    
     .map-tag {
         background-color: #333333 !important; 
         color: white !important;
@@ -87,33 +79,17 @@ st.markdown("""
         white-space: nowrap !important;
         display: block !important;
     }
-    
     .leaflet-marker-icon, .leaflet-marker-shadow { display: none !important; }
-    
-    /* 구분선 색상 살짝 조정 (흰 배경에 맞게) */
-    hr { 
-        margin: 40px 0 !important; 
-        border-top: 1px solid #eeeeee !important;
-    }
-
-    /* 계좌번호 레이아웃 배경색 조정 */
-    .acc-row-container {
-        background: #fdfdfd !important; /* 미세한 회색으로 가독성 확보 */
-        border: 1px solid #f0f0f0 !important;
-    }
+    hr { margin: 40px 0 !important; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 메인 콘텐츠 시작 ---
-
-# "THE WEDDING OF"를 사진 위로 배치
-st.markdown('<p class="eng-title">THE WEDDING OF</p>', unsafe_allow_html=True)
 
 if os.path.exists("main.jpg"):
     main_b64 = get_image_base64("main.jpg")
     st.markdown(f'<div style="text-align:center;"><img src="data:image/jpeg;base64,{main_b64}" style="width:100%; height:auto;"></div>', unsafe_allow_html=True)
 
-# 메인 정보
+# 메인 정보 수정 (8층으로 변경)
 st.markdown(f"""
     <div class="main-names">김준태 &nbsp; · &nbsp; 김경미</div>
     <div style="color: #333333; font-size: 16px; line-height: 1.6; font-weight: 500;">
@@ -196,6 +172,7 @@ st.markdown("""
     </div>
     """, unsafe_allow_html=True)
 
+# 지도 정보 및 태그 수정 (8층으로 변경)
 m = folium.Map(location=[37.5070431, 126.8902185], zoom_start=17)
 folium.Marker(
     [37.5070431, 126.8902185], 
@@ -207,11 +184,12 @@ st.markdown('<div style="text-align: center; margin-top: 15px;"><a href="https:/
 
 st.divider()
 
+# 축의금 문구 수정
 st.markdown('<p style="font-size: 16px; text-align: center; margin-bottom: 20px; color: #444;">축복의 의미로 축의금을 전달해보세요</p>', unsafe_allow_html=True)
 
 def account_row(title, account_number):
     acc_html = f"""
-    <div class="acc-row-container" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; border-radius: 12px; margin-bottom: 12px; font-family: 'Nanum Myeongjo', serif;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: white; border-radius: 12px; margin-bottom: 12px; font-family: 'Nanum Myeongjo', serif;">
         <div style="text-align: left;">
             <div style="font-size: 12px; color: #888; margin-bottom: 4px;">{title}</div>
             <div style="font-size: 15px; font-weight: bold; color: #333;">{account_number}</div>
