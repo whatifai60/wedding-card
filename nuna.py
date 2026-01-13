@@ -125,7 +125,7 @@ st.markdown("""
         <div class="contact-box">
             <p style="font-weight: bold; font-size: 17px; margin-bottom: 5px;">신부</p>
             <p style="font-size: 16px; margin-bottom: 10px;">김경미</p>
-            <p style="font-size: 13px; color: #777; line-height: 1.5;">부 김봉욱<br>모 남회숙</p>
+            <p style="font-size: 13px; color: #777; line-height: 1.5;">부 김봉욱<br>모 남희숙</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
