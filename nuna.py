@@ -84,8 +84,6 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# THE WEDDING OF 문구를 메인 사진 위로 배치
-st.markdown('<p class="eng-title">THE WEDDING OF</p>', unsafe_allow_html=True)
 
 if os.path.exists("main.jpg"):
     main_b64 = get_image_base64("main.jpg")
